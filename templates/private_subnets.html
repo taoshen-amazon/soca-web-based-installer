@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">{{id}} / 3 : Select your private subnet</p>
+                            <hr>
+                             <div class="alert alert-primary" role="alert">
+                                Private subnets must <strong>NOT</strong> be internet routable. Outgoing traffic must be redirect to a NAT gateway
+                             </div>
+
+                            {% if success == False %}
+                             <div class="alert alert-danger" role="alert">
+                                The following error occurred while querying AWS APIs: {{vpcs}}
+                                 <hr>
+                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, efs:Describe*, s3:List*, s3:Describe*
+                             </div>
+
+                            {% else %}
+
+                            {% if id == 1 and message|length  < 6 %}
+                            <div class="alert alert-danger" role="alert">
+                                    You need to have at least {{7 - id }} subnets on this VPC <hr>
+                                      We have detected <strong>only {{message|length}} subnet(s):</strong><br>
+                                      {% for subnet in message.values() %}
+                                          <li>{{subnet}}</li>
+                                      {% endfor %}
+                                  </div>
+                            {% else %}
+
+                            {% if id == 3 %}
+                            <form action="/public_subnets" method="get">
+                                {% else %}
+                                <form action="/private_subnets" method="get">
+
+                                    {%endif %}
+
+                                    {% for k,v in get_params.items() %}
+                                <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                {% endfor %}
+
+                                 <div class="form-group">
+                                    <select required="true" class="form-control" name="private_subnet_{{id}}" id="private_subnet_{{id}}">
+                                        {% for subnet_id,subnet_info in message.items() %}
+                                        <option value="{{ subnet_id }}">{{ subnet_info }}</option>
+                                        {% endfor %}
+                                    </select>
+                                 </div>
+                                <button type="submit" class="btn btn-success mb-2">Continue</button>
+                            </form>
+
+                            {% endif %}
+
+                            {% endif %}
+
+
+
+
+
+                  </div>
+
+                        </div>
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

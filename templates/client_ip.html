@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">Which IP/Subnet should have access to your cluster?</p>
+                            <hr>
+                             <div class="alert alert-primary" role="alert">
+                                 You must use /32 mask if you use a personal IP or /24 if you use a subnet
+                            </div>
+
+
+                            {% if success == True %}
+                            <div class="alert alert-success" role="alert">
+                                We have detected your IP as: <strong>{{ message }}</strong>
+                            </div>
+
+                            {% else %}
+
+                            <div class="alert alert-danger" role="alert">
+                                We could not determine your IP so we default it to <strong>{{ message }}</strong>. You probably want to visit <a href="https://ifconfig.co/" target="_blank">https://ifconfig.co/</a> and enter your actual IP.
+                            </div>
+                            {% endif %}
+
+                            <form action="stack_name" method="get">
+                                {% for k,v in get_params.items() %}
+                                <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                {%endfor %}
+                                  <div class="form-group">
+                                    <input type="text" name="client_ip" class="form-control" id="client_ip" placeholder="Your current IP is {{message}}" required="true">
+                                  </div>
+                                  <button type="submit" class="btn btn-success mb-2">Continue</button>
+
+
+                            </form>
+
+
+
+                        </div>
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

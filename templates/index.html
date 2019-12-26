@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                            <p class="lead text-muted">This website will help you configure <a ref="https://awslabs.github.io/scale-out-computing-on-aws/" target="_blank"> SOCA Cluster with your existing resources</a>
+                                <br><br>
+                                <a href="/environment"><button style="text-decoration: none; cursor:pointer;" class="btn-lg btn-success">GET STARTED</button></a>
+                            </p>
+                            <hr>
+
+                            <div style="text-align: left">
+                                <h3>Pre-Requisites</h3>
+
+                                You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket
+
+                                <br>You must have a VPC
+                                <br>Your VPC must have 6 subnets (3 private/3 public)
+                                <br>You must have 2 Elastic File Systems
+                                <br> You must have one SSH keypair
+
+                                <hr>
+                                <h3>What resources SOCA will still create:</h3>
+                                <ul>
+                                    <li>The EC2 instance used as Scheduler machine</li>
+                                    <li>2 security groups and 3 IAM roles</li>
+                                    <li>1 lambda function</li>
+                                    <li>1 Elastic IP (EIP)</li>
+                                </ul>
+
+                            </div>
+
+                                </div>
+
+
+
+
+
+                        </div>
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

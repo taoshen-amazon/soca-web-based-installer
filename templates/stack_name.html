@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">Last, but not least, how do you want to name it?</p>
+                            <hr>
+                             <div class="alert alert-primary" role="alert">
+                                 Must start with a letter, no uppercase, no space, digits and hyphens are ok<br>
+                                 PS: don't blame me, it's AWS Stack Name policy!
+                            </div>
+
+                            <form action="review" method="get">
+                                {% for k,v in get_params.items() %}
+                                <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                {%endfor %}
+                                  <div class="form-group">
+                                    <input type="text" name="stack_name" class="form-control" id="stack_name" placeholder="How do you want to name your SOCA cluster?" required="true" pattern="^[a-z][a-z0-9-]*">
+                                  </div>
+                                  <button type="submit" class="btn btn-success mb-2">Continue</button>
+
+
+                            </form>
+
+
+
+                        </div>
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

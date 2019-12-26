@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">S3 bucket where you have uploaded SOCA</p>
+                            <hr>
+                            {% if success == False %}
+                             <div class="alert alert-danger" role="alert">
+                                The following error occurred while querying AWS APIs: {{vpcs}}
+                                 <hr>
+                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, efs:Describe*, s3:List*, s3:Describe*
+                             </div>
+
+                            {% else %}
+
+                                {% if message|length < 1 %}
+                                <div class="alert alert-danger" role="alert">
+                                    No bucket detected on this AWS environment
+                                </div>
+                                {% else %}
+
+                                <form action="/s3_folder" method="get">
+                                    {% for k,v in get_params.items() %}
+                                    <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                    {% endfor %}
+
+                                     <div class="form-group">
+                                        <select required="true" class="form-control" name="s3_bucket" id="s3_bucket">
+                                             {% for bucket in message %}
+                                            <option value="{{bucket}}">{{ bucket }} </option>
+                                            {% endfor %}
+                                        </select>
+                                     </div>
+                                    <button type="submit" class="btn btn-success mb-2">Continue</button>
+                                </form>
+                            {% endif %}
+
+                            {% endif %}
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

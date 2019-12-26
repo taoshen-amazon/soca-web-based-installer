@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">What EFS do you want to use as /data?</p>
+                            <hr>
+
+                             {% if message|length < 3 %}
+                            <div class="alert alert-danger" role="alert">
+                                You need to have at least 2 EFS available.
+                            </div>
+                            {% else %}
+
+                            <form action="/efs_apps" method="get">
+                                {% for k,v in get_params.items() %}
+                                <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                {% endfor %}
+
+                                 <div class="form-group">
+                                    <select required="true" class="form-control" name="efs_data" id="efs_data">
+                                         {% for efs_id, efs_name in message.items() %}
+                                        <option value="{{efs_id}}">{{ efs_id }} ({{ efs_name}})</option>
+                                        {% endfor %}
+                                    </select>
+                                 </div>
+                                <button type="submit" class="btn btn-success mb-2">Continue</button>
+                            </form>
+
+                        {% endif %}
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

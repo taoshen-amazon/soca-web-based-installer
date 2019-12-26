@@ -1,0 +1,118 @@
+<ul class="navbar-nav bg-aws sidebar sidebar-dark accordion" id="accordionSidebar">
+      <!-- Divider -->
+
+ <hr class="sidebar-divider">
+    <div align="center">
+            <a href="/"><button style="text-decoration: none;" class="btn btn-sm btn-warning">RESTART CONFIGURATION</button></a>
+    <br>
+        {% if step > 1 %}
+        <hr>
+        <button onclick="history.back(-1)"  style="text-decoration: none;" class="btn btn-sm btn-primary">Go Back</button></a>
+        {% endif %}
+
+    </div>
+    <br>
+    <hr class="sidebar-divider">
+
+    <div class="text-center d-none d-md-inline">
+        {% if step > 1 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> AWS Environment</span></strong>
+        {% else %}
+            <span>AWS Environment</span>
+        {% endif %}
+
+    </div>
+     <div class="text-center d-none d-md-inline">
+        {% if step > 2 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> AWS Region</span></strong>
+        {% else %}
+            <span>AWS Region</span>
+        {% endif %}
+    </div>
+
+
+    <div class="text-center d-none d-md-inline">
+             {% if step > 3 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> VPC</span></strong>
+        {% else %}
+            <span>VPC</span>
+        {% endif %}
+    </div>
+
+     <div class="text-center d-none d-md-inline">
+             {% if step > 4 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> Private Subnets</span></strong>
+        {% else %}
+            <span>Private Subnets</span>
+        {% endif %}
+    </div>
+
+     <div class="text-center d-none d-md-inline">
+             {% if step > 5 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> Public Subnets</span></strong>
+        {% else %}
+            <span>Public Subnets</span>
+        {% endif %}
+    </div>
+    <div class="text-center d-none d-md-inline">
+             {% if step > 6 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> EFS /data</span></strong>
+        {% else %}
+            <span> EFS /data</span>
+        {% endif %}
+    </div>
+    <div class="text-center d-none d-md-inline">
+             {% if step > 7 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> EFS /apps</span></strong>
+        {% else %}
+            <span> EFS /apps</span>
+        {% endif %}
+    </div>
+
+    <div class="text-center d-none d-md-inline">
+             {% if step > 8 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> SSH keys</span></strong>
+        {% else %}
+            <span>SSH keys</span>
+        {% endif %}
+    </div>
+    <div class="text-center d-none d-md-inline">
+             {% if step > 9 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> S3 Bucket</span></strong>
+        {% else %}
+            <span>S3 Bucket</span>
+        {% endif %}
+    </div>
+
+    <div class="text-center d-none d-md-inline">
+             {% if step > 10 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> S3 Folder</span></strong>
+        {% else %}
+            <span>S3 Folder</span>
+        {% endif %}
+    </div>
+    <div class="text-center d-none d-md-inline">
+             {% if step > 11 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> Client IP</span></strong>
+        {% else %}
+            <span>Client IP</span>
+        {% endif %}
+    </div>
+    <div class="text-center d-none d-md-inline">
+             {% if step > 12 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> Stack Name</span></strong>
+        {% else %}
+            <span> Stack Name</span>
+        {% endif %}
+    </div>
+
+
+      <hr class="sidebar-divider d-none d-md-block">
+
+
+      <!-- Sidebar Toggler (Sidebar)
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div> -->
+
+    </ul>

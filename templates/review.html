@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                            <h3>Your configuration is ready to be imported</h3>
+                            <hr>
+
+
+                            <h5>Step 1: Import the CloudFormation URL</h5>
+                            <a href="{{cloudformation_url}}" target="_blank"><button style="text-decoration: none;cursor:pointer;" class="btn-lg btn-success">CLICK HERE TO OPEN CLOUFORMATION</button></a>
+                            <br><br>
+                            <h5>Step 2: Review and Finalize the install</h5>
+                            Review the CloudFormation parameters and don't forget to enter an LDAP username/password
+                            <br><br>
+                            <h5>Step 3: Proceed to a regular Installation</h5>
+                            Refer to the <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/#install-scale-out-computing-on-aws" target="_blank">official Scale-Out Computing on AWS documentation</a>.
+
+
+                            <hr>
+
+                            <div style="text-align: left">
+                                <h5>Inputs</h5>
+                                {% for k,v in parameters.items() %}
+
+                                <strong>{{k}}:</strong> {{v}} <br>
+
+                                {% endfor %}
+
+                                <hr>
+
+
+
+                                <h5>CloudFormation Link</h5>
+                                <small><a href="{{ cloudformation_url }}">{{cloudformation_url}}</a></small>
+                            </div>
+
+                        </div>
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>
