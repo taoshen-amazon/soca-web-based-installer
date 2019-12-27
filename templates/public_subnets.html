@@ -21,6 +21,7 @@
                             <hr>
                              <div class="alert alert-primary" role="alert">
                                 Public subnets  <strong>MUST BE</strong> internet routable. Outgoing traffic must be redirect to an Internet gateway
+                             <br> You must select 1 subnet per Availability Zones
                              </div>
 
                             {% if success == False %}
@@ -34,7 +35,7 @@
 
 
                             {% if id == 3 %}
-                            <form action="/efs_data" method="get">
+                            <form action="/subnet_verif" method="get">
                                 {% else %}
                                 <form action="/public_subnets" method="get">
 

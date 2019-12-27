@@ -9,7 +9,7 @@ Refer to [https://awslabs.github.io/scale-out-computing-on-aws/](https://awslabs
 
 ## Requirements
 
-You will need `python3` (python2 is not supported) as well as `flask` (pip install flask) and `boto3` (pip install boto3). 
+You will need `python3` (python2 is not supported) as well as `flask`, `ipaddress` and  `boto3`. Run `pip install -r requirements.txt` to install all required dependencies:
 
 You also need `awscli` [configured](https://aws.amazon.com/cli/) on your machine. My code does not change/create any AWS resources on your behalf. The only required IAM policies are `Describe` and `List`.
 
@@ -23,7 +23,7 @@ git clone git@github.com:<YOUR_GITHUB_USER>/soca-web-based-installer.git
 Execute `main.py`, this will launch a new web portal available at `http://127.0.0.1:5000`. You can change the listener address/port if needed by updating `main.py`
 
 ```python
-python3 soca-web-based-installer.git/main.py
+python3 soca-web-based-installer/main.py
 
 =============================================
 Access the installer using http://127.0.0.1:5000
@@ -55,7 +55,7 @@ You can check your current progress by looking at the left sidebar
 
 ### Error Management
 
-The installation wizard look for your AWS environment configuration and will prevent SOCA to be deployed if your backend is not configured correctly
+The installation wizard look for your AWS environment configuration and will prevent SOCA to be deployed if your backend is not configured correctly. This includes security group checks, subnet validation and general settings.
 
 ![](imgs/wizard_2.png)
 
@@ -69,8 +69,15 @@ This service use `boto3` to retrieve your AWS resources in real-time. My code on
 
 ![](imgs/error_1.png)
 
-You do not have configure `awscli` or your `$HOME/.aws/credentials` is malformed. Run `aws configure` or read the [AWS CLI instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+You do not have configured `awscli` or your `$HOME/.aws/credentials` is malformed. Run `aws configure` or read the [AWS CLI instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 
+![](imgs/error_3.png)
+
+For High Availability purpose, your 3 public/private subnets must use different availability zones.
+
+![](imgs/error_2.png)
+
+Your security groups are invalid. Follow the instructions to fix the configuration for both Scheduler and Compute Nodes security groups. 
 
 
 

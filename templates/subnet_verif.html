@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                             <div class="alert alert-danger" role="alert">
+                                 Please correct error(s) listed below:
+
+                                 {% for error,resolution in messages.items() %}
+                                 <hr>
+                                 <strong>Error:</strong> {{ error }} <br>
+                                 <strong>How to fix:</strong> {{resolution}}
+
+                                 {% endfor %}
+
+                             </div>
+
+                            <A href="{{go_back_button_href}}"><button style="text-decoration: none;" class="btn btn-lg btn-primary">Go Back</button></a>
+
+                            <hr>
+
+                            <h3>Detected Public Subnets</h3>
+                            {% for k,v in get_public_subnets_az.items() %}
+                            <strong>{{v}}</strong>: {{k}}<br>
+                            {% endfor %}
+                            <h3>Detected Private Subnets</h3>
+                             {% for k,v in get_private_subnets_az.items() %}
+                            <strong>{{v}}</strong>: {{k}}<br>
+                            {% endfor %}
+
+                        </div>
+
+                  </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

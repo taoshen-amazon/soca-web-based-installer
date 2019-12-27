@@ -1,5 +1,6 @@
 import sys
 import requests
+import ipaddress
 try:
     from flask import Flask, render_template, request, redirect
 except ImportError:
@@ -123,6 +124,54 @@ def public_subnets():
                            get_params=request.args)
 
 
+@app.route("/subnet_verif")
+def subnet_verif():
+    print(request.args)
+    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                                     "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
+        return redirect("/")
+
+    messages = {}
+    get_private_subnets_az = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_subnets_az([request.args["private_subnet_1"], request.args["private_subnet_2"],request.args["private_subnet_3"]])
+    get_public_subnets_az = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_subnets_az([request.args["public_subnet_1"], request.args["public_subnet_2"],request.args["public_subnet_3"]])
+    errors = {'PUBLIC_SUBNETS_DUPLICATE': {"status": False, "error": "You must use different Availability Zones for your public subnets.", "resolution": "Make sure your 3 public subnets use different availability zones "},
+              'PRIVATE_SUBNETS_DUPLICATE': {"status": False, "error": "You must use different Availability Zones for your private subnets.", "resolution": "Make sure your 3 private subnets use different availability zones "}}
+
+    if len(get_public_subnets_az['message'].values()) == len(set(get_public_subnets_az['message'].values())):
+        errors["PUBLIC_SUBNETS_DUPLICATE"]["status"] = True
+
+    if len(get_private_subnets_az['message'].values()) == len(set(get_private_subnets_az['message'].values())):
+        errors["PRIVATE_SUBNETS_DUPLICATE"]["status"] = True
+
+    for k, v in errors.items():
+        if v["status"] is False:
+            messages[v["error"]] = v["resolution"]
+
+    get_parameters_reset_subnet = []
+    get_parameters = []
+    for param, value in request.args.items():
+        get_parameters.append(param + '=' + value)
+        if param not in ["private_subnet_1", "private_subnet_2", "private_subnet_3",
+                         "public_subnet_1", "public_subnet_2", "public_subnet_3"]:
+            get_parameters_reset_subnet.append(param + '=' + value)
+
+
+    if messages.__len__() == 0:
+        return redirect("/efs_data?" + "&".join(get_parameters))
+    else:
+        go_back_button_href = "/private_subnets?" + "&".join(get_parameters_reset_subnet)
+        return render_template("subnet_verif.html",
+                            step=5,
+                            go_back_button_href=go_back_button_href,
+                            messages=messages,
+                            get_public_subnets_az=get_public_subnets_az['message'],
+                            get_private_subnets_az=get_private_subnets_az['message'],
+                            get_params=request.args)
+
+
+
+
+
 @app.route("/efs_data")
 def efs_data():
     if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
@@ -209,13 +258,111 @@ def client_ip():
                            success=ip["success"],
                            get_params=request.args)
 
+@app.route("/security_groups")
+def security_groups():
+    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
+        return redirect("/")
+
+    sg = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_security_groups()
+
+    return render_template("security_groups.html",
+                           step=12,
+                           message=sg["message"],
+                           success=sg["success"],
+                           get_params=request.args)
+
+
+@app.route("/sg_verif")
+def sg_verif():
+    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip", "sg_scheduler", "sg_compute"]) is False:
+        return redirect("/")
+
+    get_rules = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_rules_for_security_group([request.args['sg_scheduler'], request.args['sg_compute']])
+    get_rules_efs = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_efs_security_groups([request.args['efs_apps'], request.args['efs_data']])
+    rules_scheduler = get_rules['message'][request.args['sg_scheduler']]
+    rules_compute = get_rules['message'][request.args['sg_compute']]
+
+
+    errors = {"SCHEDULER_SG_IN_COMPUTE":  {"status": False, "error": "Scheduler SG must be authorized for all ports (All TCP) in Compute SG", "resolution": "Add new rule that allow TCP ports '0-65535' for " + request.args['sg_compute']},
+              "COMPUTE_SG_IN_SCHEDULER":  {"status": False, "error": "Compute SG must be authorized for all ports (All TCP) in Scheduler SG", "resolution": "Add a new rule that allow TCP ports '0-65535' for " + request.args['sg_scheduler']},
+              "CLIENT_IP_HTTPS_IN_SCHEDULER": {"status": False, "error": "Client IP must be allowed for port 443 (80 optional) in Scheduler SG", "resolution": "Add two rules on " + request.args['sg_scheduler'] + " for TCP/80 and TCP/443 for " + request.args['client_ip']},
+              "CLIENT_IP_SSH_IN_SCHEDULER": {"status": False,"error": "Client IP must be allowed for port 22 (SSH) in Scheduler SG","resolution": "Add two rules on " + request.args['sg_scheduler'] + " for TCP/22 for " + request.args['client_ip']},
+
+              "SCHEDULER_SG_EQUAL_COMPUTE":  {"status": False, "error": "Scheduler SG and Compute SG must be different", "resolution": "You must choose two different security groups"},
+              "COMPUTE_SG_EGRESS_EFA": {"status": False, "error": "Compute SG must reference egress traffic to itself for EFA", "resolution": "Add a new (EGRESS) rule on " + request.args['sg_compute'] + " + that allow TCP ports '0-65535' for " + request.args['sg_compute'] +". Make sure you configure EGRESS rule and not INGRESS"},
+              "EFS_APP_SG": {"status": False, "error": "SG assigned to EFS App " + request.args["efs_apps"] + " must allow Scheduler SG and Compute SG", "resolution": "Add " + request.args['sg_compute'] + " and " + request.args['sg_scheduler'] + " on your EFS Apps " + request.args["efs_apps"]},
+              "EFS_DATA_SG": {"status": False, "error": "SG assigned to EFS App " + request.args["efs_data"] + " must allow Scheduler SG and Compute SG","resolution": "Add " + request.args['sg_compute'] + " and " + request.args['sg_scheduler'] + " on your EFS Data " + request.args["efs_data"]},
+    }
+
+    messages = {}
+    for rules in rules_scheduler:
+        if rules["from_port"] == 0 and rules["to_port"] == 65535:
+            for rule in rules["whitelist_ip"]:
+                if request.args['sg_compute'] in rule:
+                    errors["COMPUTE_SG_IN_SCHEDULER"]["status"] = True
+
+        if rules["from_port"] == 443 or rules["from_port"] == 22:
+            for rule in rules["whitelist_ip"]:
+                client_ip_netmask = request.args['client_ip'].split('/')[1]
+                if client_ip_netmask == '32':
+                    if ipaddress.IPv4Address(request.args['client_ip'].split('/')[0]) in ipaddress.IPv4Network(rule) is True:
+                        if rules["from_port"] == 443:
+                            errors["CLIENT_IP_HTTPS_IN_SCHEDULER"]["status"] = True
+                        if rules["from_port"] == 22:
+                            errors["CLIENT_IP_SSH_IN_SCHEDULER"]["status"] = True
+                else:
+                    if request.args['client_ip'] in rule:
+                        if rules["from_port"] == 443:
+                            errors["CLIENT_IP_HTTPS_IN_SCHEDULER"]["status"] = True
+                        if rules["from_port"] == 22:
+                            errors["CLIENT_IP_SSH_IN_SCHEDULER"]["status"] = True
+
+    for rules in rules_compute:
+        if rules["from_port"] == 0 and rules["to_port"] == 65535:
+            for rule in rules["whitelist_ip"]:
+                if request.args['sg_scheduler'] in rule:
+                    errors["SCHEDULER_SG_IN_COMPUTE"]["status"] = True
+
+                if rules["type"] == "egress":
+                    if request.args["sg_compute"] in rule:
+                        errors["COMPUTE_SG_EGRESS_EFA"]["status"] = True
+
+    if request.args['sg_scheduler'] in get_rules_efs['message'][request.args['efs_apps']] and request.args['sg_compute'] in get_rules_efs['message'][request.args['efs_apps']]:
+        errors["EFS_APP_SG"]["status"] = True
+
+    if request.args['sg_scheduler'] in get_rules_efs['message'][request.args['efs_data']] and request.args['sg_compute'] in get_rules_efs['message'][request.args['efs_data']]:
+        errors["EFS_DATA_SG"]["status"] = True
+
+    if request.args["sg_scheduler"] != request.args["sg_compute"]:
+        errors["SCHEDULER_SG_EQUAL_COMPUTE"]["status"] = True
+
+    for k, v in errors.items():
+        if v["status"] is False:
+            messages[v["error"]] = v["resolution"]
+
+    get_parameters = []
+    for param, value in request.args.items():
+        get_parameters.append(param + '=' + value)
+
+    if messages.__len__() == 0:
+        return redirect("/stack_name?" + "&".join(get_parameters))
+    else:
+        return render_template("sg_verif.html",
+                               step=12,
+                               messages=messages,
+                               rules_scheduler=rules_scheduler,
+                               rules_compute=rules_compute,
+                               get_params=request.args)
+
 @app.route("/stack_name")
 def stack_name():
     if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
         return redirect("/")
     return render_template("stack_name.html",
-                           step=12,
+                           step=13,
                            get_params=request.args)
 
 @app.route("/review")
@@ -241,11 +388,13 @@ def review():
                          "&param_EFSAppsDns=" + request.args["efs_apps"] + \
                          "&param_SSHKeyPair=" + request.args["key"] + \
                          "&param_S3InstallBucket=" + request.args["s3_bucket"] + \
-                        "&param_S3InstallFolder=" + request.args["s3_folder"] + \
-                         "&param_ClientIp=" + request.args["client_ip"]
+                         "&param_S3InstallFolder=" + request.args["s3_folder"] + \
+                         "&param_ClientIp=" + request.args["client_ip"] + \
+                         "&param_SecurityGroupIdScheduler=" + request.args["sg_scheduler"] + \
+                         "&param_SecurityGroupIdCompute=" + request.args["sg_compute"]
 
     return render_template("review.html",
-                           step=13,
+                           step=14,
                            cloudformation_url=cloudformation_url,
                            parameters=request.args)
 

@@ -27,6 +27,107 @@ class CheckAWSConfiguration:
             return {'success': False,
                     'message': str(err)}
 
+    def get_security_groups(self):
+        try:
+            ec2 = self.session.client('ec2')
+            sgs = {}
+            for sg in ec2.describe_security_groups()['SecurityGroups']:
+                sgs[sg['GroupId']] = sg['GroupId'] + " (" + sg['GroupName'] + ")"
+
+            return {'success': True,
+                    'message': sgs}
+
+        except Exception as err:
+            return {'success': False,
+                    'message': str(err)}
+
+    def get_rules_for_security_group(self, sg_ids):
+        try:
+            ec2 = self.session.client('ec2')
+            rules = {}
+            for sg_id in sg_ids:
+                for sg in ec2.describe_security_groups()['SecurityGroups']:
+                    whitelist_rules = []
+                    if sg['GroupId'] == sg_id:
+                        if 'IpPermissions' in sg.keys():
+                            for permission in sg['IpPermissions']:
+                                if 'FromPort' in permission.keys():
+                                    from_port = permission['FromPort']
+                                    to_port = permission['ToPort']
+                                else:
+                                    # IpProtocol = -1 -> All Traffic
+                                    from_port = 0
+                                    to_port = 65535
+
+                                whitelist_ip = []
+
+                                if permission['IpRanges'].__len__() > 0:
+                                    for r in permission['IpRanges']:
+                                        if 'CidrIp' in r.keys():
+                                            whitelist_ip.append(r['CidrIp'])
+
+                                if permission['UserIdGroupPairs'].__len__() > 0:
+                                    for g in permission['UserIdGroupPairs']:
+                                        if 'GroupId' in g.keys():
+                                            whitelist_ip.append(g['GroupId'])
+
+                                whitelist_rules.append({'from_port': from_port,
+                                                        'to_port': to_port,
+                                                        'whitelist_ip': whitelist_ip,
+                                                        'type': 'ingress'})
+
+                                rules[sg_id] = whitelist_rules
+
+                        if 'IpPermissionsEgress' in sg.keys():
+                            for permission in sg['IpPermissionsEgress']:
+                                if 'FromPort' in permission.keys():
+                                    from_port = permission['FromPort']
+                                    to_port = permission['ToPort']
+                                else:
+                                    # IpProtocol = -1 -> All Traffic
+                                    from_port = 0
+                                    to_port = 65535
+
+                                whitelist_ip = []
+
+                                if permission['IpRanges'].__len__() > 0:
+                                    for r in permission['IpRanges']:
+                                        if 'CidrIp' in r.keys():
+                                            whitelist_ip.append(r['CidrIp'])
+
+                                if permission['UserIdGroupPairs'].__len__() > 0:
+                                    for g in permission['UserIdGroupPairs']:
+                                        if 'GroupId' in g.keys():
+                                            whitelist_ip.append(g['GroupId'])
+
+                                whitelist_rules.append({'from_port': from_port,
+                                                        'to_port': to_port,
+                                                        'whitelist_ip': whitelist_ip,
+                                                        'type': 'egress'})
+
+                                rules[sg_id] = whitelist_rules
+
+            return {'success': True,
+                    'message': rules}
+
+        except Exception as err:
+            return {'success': False,
+                    'message': str(err)}
+
+    def get_subnets_az(self, subnet_id):
+        try:
+            ec2 = self.session.client('ec2')
+            subnets = {}
+            for subnet in subnet_id:
+                for subnet in ec2.describe_subnets(Filters=[{'Name': 'subnet-id', 'Values': [subnet]}])['Subnets']:
+                    subnets[subnet['SubnetId']] = subnet['AvailabilityZone']
+            return {'success': True,
+                    'message': subnets}
+
+        except Exception as err:
+            return {'success': False,
+                    'message': str(err)}
+
     def get_subnets(self, vpc_id):
         try:
             ec2 = self.session.client('ec2')
@@ -62,6 +163,26 @@ class CheckAWSConfiguration:
             filesystems = {}
             for filesystem in efs.describe_file_systems()['FileSystems']:
                 filesystems[filesystem['FileSystemId'] + ".efs." + self.region + ".amazonaws.com" ] = filesystem['Name']
+            return {"success": True,
+                    "message": filesystems}
+
+        except Exception as err:
+            return {'success': False,
+                    'message': str(err)}
+
+    def get_efs_security_groups(self, efs_ids):
+        try:
+            efs = self.session.client("efs")
+            filesystems = {}
+            for id in efs_ids:
+                sgs = []
+                for mount in efs.describe_mount_targets(FileSystemId=id.split(".")[0])["MountTargets"]:
+                    for sg in efs.describe_mount_target_security_groups(MountTargetId=mount["MountTargetId"])['SecurityGroups']:
+                        if sg not in sgs:
+                            sgs.append(sg)
+
+                filesystems[id] = sgs
+
             return {"success": True,
                     "message": filesystems}
 

@@ -20,7 +20,8 @@
                           <p class="lead text-muted">{{id}} / 3 : Select your private subnet</p>
                             <hr>
                              <div class="alert alert-primary" role="alert">
-                                Private subnets must <strong>NOT</strong> be internet routable. Outgoing traffic must be redirect to a NAT gateway
+                                Private subnets must <strong>NOT</strong> be internet routable. Outgoing traffic must be redirect to a NAT gateway<br>
+                                 You must select 1 subnet per Availability Zones
                              </div>
 
                             {% if success == False %}

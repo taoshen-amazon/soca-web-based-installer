@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                             <div class="alert alert-danger" role="alert">
+                                 Please correct error(s) listed below:
+
+                                 {% for error,resolution in messages.items() %}
+                                 <hr>
+                                 <strong>Error:</strong> {{ error }} <br>
+                                 <strong>How to fix:</strong> {{resolution}}
+
+                                 {% endfor %}
+                             </div>
+
+                            <button onclick="history.back(-1)"  style="text-decoration: none;" class="btn btn-lg btn-primary">Go Back</button></a>
+
+                            <hr>
+
+                            <h3>Detected Scheduler Rules</h3>
+                            {% for rule in rules_scheduler %}
+                            Type {{rule.type}}: From {{rule.from_port}} to {{rule.to_port}} for {{rule.whitelist_ip}}<br>
+                            {% endfor %}
+                            <h3>Detected Compute Rules</h3>
+                             {% for rule in rules_compute %}
+                            Type {{rule.type}}: From {{rule.from_port}} to {{rule.to_port}} for {{rule.whitelist_ip}}<br>
+                            {% endfor %}
+
+                        </div>
+
+                  </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>

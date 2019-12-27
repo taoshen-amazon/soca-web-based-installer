@@ -36,7 +36,7 @@
                             </div>
                             {% endif %}
 
-                            <form action="stack_name" method="get">
+                            <form action="/security_groups" method="get">
                                 {% for k,v in get_params.items() %}
                                 <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
                                 {%endfor %}
