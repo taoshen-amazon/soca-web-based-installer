@@ -1,5 +1,6 @@
 = Web-Based Installer for SOCA
 :toc:
+
 == What is SOCA?
 
 Refer to link:https://awslabs.github.io/scale-out-computing-on-aws/[https://awslabs.github.io/scale-out-computing-on-aws/] if you are not familiar with SOCA.
