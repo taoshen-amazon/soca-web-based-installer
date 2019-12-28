@@ -19,6 +19,15 @@
                         <div class="container">
                              <div class="alert alert-danger" role="alert">
                                  Please correct error(s) listed below:
+                                 {% if success == False %}
+                                     <div class="alert alert-danger" role="alert">
+                                        The following error occurred while querying AWS APIs: {{message}}
+                                         <hr>
+                                         <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
+                                     </div>
+                                                             <button onclick="history.back(-1)"  style="text-decoration: none;" class="btn btn-lg btn-primary">Go Back</button></a>
+
+                                 {% else %}
 
                                  {% for error,resolution in messages.items() %}
                                  <hr>
@@ -42,7 +51,7 @@
                             {% endfor %}
 
                         </div>
-
+            {% endif %}
                   </section>
               </main>
           </div>

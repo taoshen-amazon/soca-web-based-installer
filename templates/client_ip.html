@@ -36,12 +36,18 @@
                             </div>
                             {% endif %}
 
+                            {% if get_params.mode == "standard" %}
+                            <form action="/image" method="get">
+                                {% else %}
                             <form action="/security_groups" method="get">
+
+                            {% endif %}
+
                                 {% for k,v in get_params.items() %}
                                 <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
                                 {%endfor %}
                                   <div class="form-group">
-                                    <input type="text" name="client_ip" class="form-control" id="client_ip" placeholder="Your current IP is {{message}}" required="true">
+                                    <input type="text" name="client_ip" class="form-control" id="client_ip" value="{{message}}" required="true">
                                   </div>
                                   <button type="submit" class="btn btn-success mb-2">Continue</button>
 

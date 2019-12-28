@@ -17,34 +17,124 @@
               <main role="main">
                   <section class="jumbotron text-center">
                         <div class="container">
-                            <p class="lead text-muted">This website will help you configure <a ref="https://awslabs.github.io/scale-out-computing-on-aws/" target="_blank"> SOCA Cluster with your existing resources</a>
-                                <br><br>
-                                <a href="/environment"><button style="text-decoration: none; cursor:pointer;" class="btn-lg btn-success">GET STARTED</button></a>
-                            </p>
+                            <h4>How it works?</h4>
+                            <ul class="list-group">
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Select whether you want to perform a Standard or Advanced install.
+    <span class="badge badge-primary badge-pill">1</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Follow the instructions using the installation wizard.
+    <span class="badge badge-primary badge-pill">2</span>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    Click on the link to open the CloudFormation console with your pre-generated stack parameters.
+    <span class="badge badge-primary badge-pill">3</span>
+  </li>
+</ul>
                             <hr>
 
-                            <div style="text-align: left">
-                                <h3>Pre-Requisites</h3>
+                            <div class="row">
 
-                                You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket
 
-                                <br>You must have a VPC
-                                <br>Your VPC must have 6 subnets (3 private/3 public)
-                                <br>You must have 2 Elastic File Systems
-                                <br> You must have one SSH keypair
 
-                                <hr>
-                                <h3>What resources SOCA will still create:</h3>
-                                <ul>
-                                    <li>The EC2 instance used as Scheduler machine</li>
-                                    <li>2 security groups and 3 IAM roles</li>
-                                    <li>1 lambda function</li>
-                                    <li>1 Elastic IP (EIP)</li>
-                                </ul>
+                                <div class="col-md-6">
+                                    <h3>Let SOCA install everything</h3>
+                                    <a href="/environment?mode=standard"><button style="text-decoration: none; cursor:pointer;" class="btn-lg btn-success">STANDARD INSTALL</button></a>
+                                    <br><br>
+                                    <h5>Pre-Requisites</h5>
 
-                            </div>
+                                    You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket.
+                                    <br>You must have <code>awscli</code> <a href="https://aws.amazon.com/cli/" target="_blank"> installed and configured </a>
 
                                 </div>
+
+                                <div class="col-md-6">
+                                    <h3>I want to use my existing resources</h3>
+                                    <a href="/environment?mode=advanced"><button style="text-decoration: none; cursor:pointer;" class="btn-lg btn-success">ADVANCED INSTALL</button></a>
+                                    <div style="text-align: left">
+                                                  <br>
+
+                                        <h5>Pre-Requisites</h5>
+
+                                        You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket.
+                                        <br>You must have <code>awscli</code> <a href="https://aws.amazon.com/cli/" target="_blank"> installed and configured </a>
+                                        <br>You must have a VPC
+                                        <br>Your VPC must have 6 subnets (3 private/3 public)
+                                        <br>You must have 2 Elastic File Systems
+                                        <br>You must have one SSH keypair
+                                        <br>You must have two security groups configured correctly
+                                        <hr>
+                                        <h5>What resources SOCA will still create:</h5>
+                                        <ul>
+                                            <li>The EC2 instance used as Scheduler machine</li>
+                                            <li>3 IAM roles</li>
+                                            <li>1 Lambda function</li>
+                                            <li>1 Elastic IP (EIP)</li>
+                                        </ul>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h4>IAM Permissions</h4>
+                     This tool only perform "ReadOnly" operations. Here is the list of API permissions your IAM user must have in order to be able to use this tool.
+<br><br>
+                            <h5>For Standard Installation</h5>
+
+
+<pre style="text-align: left"><code>
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "WebBasedSOCAPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "ec2:DescribeKeyPairs"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+ </code>
+</pre>
+                            <h5>For Advanced Installation</h5>
+<pre style="text-align: left"><code>
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "WebBasedSOCAAdvancedPermissions1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "WebBasedSOCAAdvancedPermissions2",
+            "Effect": "Allow",
+            "Action": [
+                "elasticfilesystem:DescribeMountTargets",
+                "elasticfilesystem:DescribeFileSystems",
+                "elasticfilesystem:DescribeMountTargetSecurityGroups"
+            ],
+            "Resource": "arn:aws:elasticfilesystem:*:*:file-system/*"
+        }
+    ]
+}
+</code></pre>
+                        </div>
 
 
 

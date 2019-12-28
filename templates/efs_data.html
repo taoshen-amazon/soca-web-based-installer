@@ -19,6 +19,14 @@
                         <div class="container">
                           <p class="lead text-muted">What EFS do you want to use as /data?</p>
                             <hr>
+                             {% if success == False %}
+                             <div class="alert alert-danger" role="alert">
+                                The following error occurred while querying AWS APIs: {{message}}
+                                 <hr>
+                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
+                             </div>
+
+                            {% else %}
 
                              {% if message|length < 3 %}
                             <div class="alert alert-danger" role="alert">
@@ -42,6 +50,7 @@
                             </form>
 
                         {% endif %}
+                            {% endif %}
                 </section>
               </main>
           </div>

@@ -21,9 +21,9 @@
                             <hr>
                             {% if success == False %}
                              <div class="alert alert-danger" role="alert">
-                                The following error occurred while querying AWS APIs: {{vpcs}}
+                                The following error occurred while querying AWS APIs: {{message}}
                                  <hr>
-                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, efs:Describe*, s3:List*, s3:Describe*
+                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
                              </div>
 
                             {% else %}
@@ -32,6 +32,8 @@
                                     No top level folders detected on this s3 bucket
                                 </div>
                                 {% else %}
+
+
 
                              <form action="/client_ip" method="get">
                                     {% for k,v in get_params.items() %}

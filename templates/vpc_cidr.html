@@ -17,26 +17,27 @@
               <main role="main">
                   <section class="jumbotron text-center">
                         <div class="container">
-                          <p class="lead text-muted">Choose the region you want to use</p>
+                          <p class="lead text-muted">What would be the CIDR of your VPC</p>
                             <hr>
-                            {% if get_params.mode == "standard" %}
-                            <form action="/vpc_cidr" method="get">
-                                {% else %}
-                             <form action="/vpc" method="get">
-                            {% endif %}
+                             <div class="alert alert-primary" role="alert">
+                                 CIDR must use /16 netmask (eg: 10.0.0.0/16)
+
+                            </div>
+
+                            <form action="/ssh" method="get">
                                 {% for k,v in get_params.items() %}
                                 <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
-                                {% endfor %}
+                                {%endfor %}
+                                  <div class="form-group">
+                                    <input type="text" name="vpc_cidr" class="form-control" id="vpc_cidr" placeholder="What will be your CIDR format (x.x.x.x/16)" required="true" pattern="((\d{1,3})\.){3}\d{1,3}/16">
+                                  </div>
+                                  <button type="submit" class="btn btn-success mb-2">Continue</button>
 
-                                 <div class="form-group">
-                                    <select required="true" class="form-control" name="region" id="region">
-                                         {% for region in message %}
-                                        <option value="{{region}}">{{region}}</option>
-                                        {% endfor %}
-                                    </select>
-                                 </div>
-                                <button type="submit" class="btn btn-success mb-2">Continue</button>
+
                             </form>
+
+
+
                         </div>
                 </section>
               </main>

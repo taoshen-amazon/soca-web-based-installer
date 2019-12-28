@@ -19,6 +19,9 @@ def validate_parameters(request, expected_parameters):
         if parameter not in request.args.keys():
             return False
         else:
+            if parameter == "mode":
+                if request.args[parameter] not in ["standard", "advanced"]:
+                    return False
             param_value[parameter] = request.args[parameter]
 
     return param_value
@@ -32,6 +35,8 @@ def index():
 
 @app.route("/environment")
 def environment():
+    if validate_parameters(request, ["mode"]) is False:
+        return redirect("/")
     envs = get_awscli_credentials.get_config_file()
     return render_template("environment.html",
                            step=1,
@@ -40,7 +45,7 @@ def environment():
 
 @app.route("/region")
 def region():
-    if validate_parameters(request, ["env"]) is False:
+    if validate_parameters(request, ["mode","env"]) is False:
         return redirect("/")
     regions = get_awscli_credentials.get_regions()
     return render_template("region.html",
@@ -51,7 +56,7 @@ def region():
 
 @app.route("/vpc")
 def vpc():
-    if validate_parameters(request, ["region", "env"]) is False:
+    if validate_parameters(request, ["mode", "region", "env"]) is False:
         return redirect("/")
 
     vpcs = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_vpcs()
@@ -61,10 +66,19 @@ def vpc():
                            message=vpcs["message"],
                            get_params=request.args)
 
+@app.route("/vpc_cidr")
+def vpc_cidr():
+    if validate_parameters(request, ["region", "env", "mode"]) is False:
+        return redirect("/")
+
+    return render_template("vpc_cidr.html",
+                           step=3,
+                           get_params=request.args)
+
 
 @app.route("/private_subnets")
 def private_subnets():
-    if validate_parameters(request, ["region", "env", "vpc"]) is False:
+    if validate_parameters(request, ["mode", "region", "env", "vpc"]) is False:
         return redirect("/")
 
     subnets = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_subnets(request.args["vpc"])
@@ -90,7 +104,7 @@ def private_subnets():
 
 @app.route("/public_subnets")
 def public_subnets():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3"]) is False:
+    if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3"]) is False:
         return redirect("/")
 
     subnets = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_subnets(request.args["vpc"])
@@ -126,8 +140,7 @@ def public_subnets():
 
 @app.route("/subnet_verif")
 def subnet_verif():
-    print(request.args)
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+    if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                      "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
         return redirect("/")
 
@@ -174,7 +187,7 @@ def subnet_verif():
 
 @app.route("/efs_data")
 def efs_data():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+    if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                      "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
         return redirect("/")
     filesystems = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_efs()
@@ -187,7 +200,7 @@ def efs_data():
 
 @app.route("/efs_apps")
 def efs_apps():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+    if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data"]) is False:
         return redirect("/")
     filesystems = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_efs()
@@ -201,9 +214,17 @@ def efs_apps():
 
 @app.route("/ssh")
 def ssh():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                                                 "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps"]) is False:
+                return redirect("/")
+
     keys = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_security_keys()
     return render_template("ssh.html",
                            step=8,
@@ -214,9 +235,17 @@ def ssh():
 
 @app.route("/s3_bucket")
 def s3_bucket():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key"]) is False:
+                return redirect("/")
+
     buckets = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_s3_bucket()
     return render_template("s3_bucket.html",
                            step=9,
@@ -227,9 +256,17 @@ def s3_bucket():
 
 @app.route("/s3_folder")
 def s3_folder():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key","s3_bucket"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket"]) is False:
+                return redirect("/")
+
     folders = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_s3_folder(request.args["s3_bucket"])
     return render_template("s3_folder.html",
                            step=10,
@@ -239,9 +276,16 @@ def s3_folder():
 
 @app.route("/client_ip")
 def client_ip():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "s3_folder"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key","s3_bucket", "s3_folder"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["mode", "region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                                  "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "s3_folder"]) is False:
+                return redirect("/")
     check_ip_endpoint = "https://ifconfig.co/ip"
     req = requests.get(check_ip_endpoint)
     ip = {}
@@ -281,6 +325,13 @@ def sg_verif():
 
     get_rules = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_rules_for_security_group([request.args['sg_scheduler'], request.args['sg_compute']])
     get_rules_efs = client.CheckAWSConfiguration(request.args["env"], request.args["region"]).get_efs_security_groups([request.args['efs_apps'], request.args['efs_data']])
+    if get_rules_efs["success"] is False:
+        return render_template("sg_verif.html",
+                               step=12,
+                               success=get_rules_efs["success"],
+                               message=get_rules_efs["message"],
+                               get_params=request.args)
+
     rules_scheduler = get_rules['message'][request.args['sg_scheduler']]
     rules_compute = get_rules['message'][request.args['sg_compute']]
 
@@ -307,7 +358,7 @@ def sg_verif():
             for rule in rules["whitelist_ip"]:
                 client_ip_netmask = request.args['client_ip'].split('/')[1]
                 if client_ip_netmask == '32':
-                    if ipaddress.IPv4Address(request.args['client_ip'].split('/')[0]) in ipaddress.IPv4Network(rule) is True:
+                    if ipaddress.IPv4Address(request.args['client_ip'].split('/')[0]) in ipaddress.IPv4Network(rule):
                         if rules["from_port"] == 443:
                             errors["CLIENT_IP_HTTPS_IN_SCHEDULER"]["status"] = True
                         if rules["from_port"] == 22:
@@ -329,6 +380,7 @@ def sg_verif():
                     if request.args["sg_compute"] in rule:
                         errors["COMPUTE_SG_EGRESS_EFA"]["status"] = True
 
+
     if request.args['sg_scheduler'] in get_rules_efs['message'][request.args['efs_apps']] and request.args['sg_compute'] in get_rules_efs['message'][request.args['efs_apps']]:
         errors["EFS_APP_SG"]["status"] = True
 
@@ -347,7 +399,7 @@ def sg_verif():
         get_parameters.append(param + '=' + value)
 
     if messages.__len__() == 0:
-        return redirect("/stack_name?" + "&".join(get_parameters))
+        return redirect("/image?" + "&".join(get_parameters))
     else:
         return render_template("sg_verif.html",
                                step=12,
@@ -356,45 +408,99 @@ def sg_verif():
                                rules_compute=rules_compute,
                                get_params=request.args)
 
+@app.route("/image")
+def image():
+    if validate_parameters(request, ["mode"]) is False:
+        return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key", "s3_bucket", "s3_folder"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
+                return redirect("/")
+
+    return render_template("images.html",
+                           step=13,
+                           get_params=request.args)
 @app.route("/stack_name")
 def stack_name():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key","s3_bucket", "s3_folder", "base_os", "instance_ami"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                                  "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip", "base_os", "instance_ami"]) is False:
+                return redirect("/")
     return render_template("stack_name.html",
-                           step=13,
+                           step=14,
                            get_params=request.args)
 
 @app.route("/review")
 def review():
-    if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
-                          "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip", "stack_name"]) is False:
+    if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
-    cloudformation_url = "https://console.aws.amazon.com/cloudformation/home?" \
-                         "region=" + request.args["region"] + \
-                         "#/stacks/create/review?" + \
-                         "stackName="+ request.args["stack_name"] + \
-                         "&templateURL=https://s3.amazonaws.com/" + request.args["s3_bucket"] + \
-                         "/" + request.args["s3_folder"] + \
-                         "/install-with-existing-resources.template" + \
-                         "&param_VpcId=" + request.args["vpc"] + \
-                         "&param_PrivateSubnet1=" + request.args["private_subnet_1"] + \
-                         "&param_PrivateSubnet2=" + request.args["private_subnet_2"] + \
-                         "&param_PrivateSubnet3=" + request.args["private_subnet_3"] + \
-                         "&param_PublicSubnet1=" + request.args["public_subnet_1"] + \
-                         "&param_PublicSubnet2=" + request.args["public_subnet_2"] + \
-                         "&param_PublicSubnet3=" + request.args["public_subnet_3"] + \
-                         "&param_EFSDataDns=" + request.args["efs_data"] + \
-                         "&param_EFSAppsDns=" + request.args["efs_apps"] + \
-                         "&param_SSHKeyPair=" + request.args["key"] + \
-                         "&param_S3InstallBucket=" + request.args["s3_bucket"] + \
-                         "&param_S3InstallFolder=" + request.args["s3_folder"] + \
-                         "&param_ClientIp=" + request.args["client_ip"] + \
-                         "&param_SecurityGroupIdScheduler=" + request.args["sg_scheduler"] + \
-                         "&param_SecurityGroupIdCompute=" + request.args["sg_compute"]
+    else:
+        if request.args["mode"] == "standard":
+            if validate_parameters(request, ["region", "env", "vpc_cidr", "key","s3_bucket", "s3_folder", "base_os", "instance_ami", "stack_name"]) is False:
+                return redirect("/")
+        else:
+            if validate_parameters(request, ["region", "env", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
+                                  "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip",  "base_os", "instance_ami", "stack_name"]) is False:
+                return redirect("/")
+
+
+    if request.args["mode"] == "advanced":
+        cloudformation_url = "https://console.aws.amazon.com/cloudformation/home?" \
+                             "region=" + request.args["region"] + \
+                             "#/stacks/create/review?" + \
+                             "stackName="+ request.args["stack_name"] + \
+                             "&templateURL=https://s3.amazonaws.com/" + request.args["s3_bucket"] + \
+                             "/" + request.args["s3_folder"] + \
+                             "/install-with-existing-resources.template" + \
+                             "&param_VpcId=" + request.args["vpc"] + \
+                             "&param_PrivateSubnet1=" + request.args["private_subnet_1"] + \
+                             "&param_PrivateSubnet2=" + request.args["private_subnet_2"] + \
+                             "&param_PrivateSubnet3=" + request.args["private_subnet_3"] + \
+                             "&param_PublicSubnet1=" + request.args["public_subnet_1"] + \
+                             "&param_PublicSubnet2=" + request.args["public_subnet_2"] + \
+                             "&param_PublicSubnet3=" + request.args["public_subnet_3"] + \
+                             "&param_EFSDataDns=" + request.args["efs_data"] + \
+                             "&param_EFSAppsDns=" + request.args["efs_apps"] + \
+                             "&param_SSHKeyPair=" + request.args["key"] + \
+                             "&param_S3InstallBucket=" + request.args["s3_bucket"] + \
+                             "&param_S3InstallFolder=" + request.args["s3_folder"] + \
+                             "&param_ClientIp=" + request.args["client_ip"] + \
+                             "&param_SecurityGroupIdScheduler=" + request.args["sg_scheduler"] + \
+                             "&param_SecurityGroupIdCompute=" + request.args["sg_compute"] + \
+                             "&param_BaseOS=" + request.args["base_os"] + \
+                             "&param_CustomAMI=" + request.args["instance_ami"]
+
+    if request.args["mode"] == "standard":
+        cloudformation_url = "https://console.aws.amazon.com/cloudformation/home?" \
+                             "region=" + request.args["region"] + \
+                             "#/stacks/create/review?" + \
+                             "stackName=" + request.args["stack_name"] + \
+                             "&templateURL=https://s3.amazonaws.com/" + request.args["s3_bucket"] + \
+                             "/" + request.args["s3_folder"] + \
+                             "/scale-out-computing-on-aws.template" + \
+                             "&param_VpcCidr=" + request.args["vpc_cidr"] + \
+                             "&param_S3InstallBucket=" + request.args["s3_bucket"] + \
+                             "&param_S3InstallFolder=" + request.args["s3_folder"] + \
+                             "&param_ClientIp=" + request.args["client_ip"] + \
+                             "&param_BaseOS=" + request.args["base_os"] + \
+                             "&param_SSHKeyPair=" + request.args["key"] + \
+                             "&param_CustomAMI=" + request.args["instance_ami"]
+
+
+
 
     return render_template("review.html",
-                           step=14,
+                           step=15,
                            cloudformation_url=cloudformation_url,
                            parameters=request.args)
 

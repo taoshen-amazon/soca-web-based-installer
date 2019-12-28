@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     {% include 'common/header.html' %}
+</head>
+
+<body id="page-top">
+
+  <div id="wrapper">
+    {% include 'common/vertical_menu_bar.html' %}
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+          <br>
+          <div class="container-fluid">
+              {% include 'common/horizontal_menu_bar.html' %}
+              <main role="main">
+                  <section class="jumbotron text-center">
+                        <div class="container">
+                          <p class="lead text-muted">Select your OS and image id (optional)</p>
+                            <hr>
+
+                            <form action="/stack_name" method="get">
+                                {% for k,v in get_params.items() %}
+                                <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                                {% endfor %}
+
+
+                                <div class="form-group">
+                                    <h3>Base OS</h3>
+                                    <select required="true" class="form-control" name="base_os" id="base_os" required="true">
+                                        <option selected value="amazonlinux2">Amazon Linux 2</option>
+                                        <option value="centos7">Centos 7</option>
+                                        <option value="rhel7">Red Hat Enterprise 7</option>
+                                        </select>
+                                     </div>
+                                    <div class="form-group">
+
+                                        <h3>(Optional) Custom image</h3>
+                                        <div class="alert alert-primary" role="alert">
+                                             Make sure to select the right Base OS distribution if you use a custom image
+                                         </div>
+                                        <input type="text" name="instance_ami" class="form-control" id="instance_ami"  placeholder="Image ID (ami-xxx) if using a custom AMI">
+                                     </div>
+
+                                <button type="submit" class="btn btn-success mb-2">Continue</button>
+                                </form>
+
+
+
+                </section>
+              </main>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+    {% include 'common/footer.html' %}
+
+</body>
+
+</html>
