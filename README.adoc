@@ -15,7 +15,7 @@ You also need `awscli` link:https://aws.amazon.com/cli/[configured] on your mach
 
 Clone the repo
 ```bash
-git clone git@github.com:<YOUR_GITHUB_USER>/soca-web-based-installer.git
+git clone https://github.com/mcrozes/soca-web-based-installer.git
 ```
 
 Execute `python3 main.py`, this will launch a new web portal available at `http://127.0.0.1:5000`. You can change the listener address/port if needed by updating `main.py`
