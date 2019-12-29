@@ -7,27 +7,31 @@ Refer to link:https://awslabs.github.io/scale-out-computing-on-aws/[https://awsl
 
 == Online Version
 
-You can see a live version of the web-based installer for Scale-Out Computing on AWS (SOCA) at: link:install.soca.dev[https://install.soca.dev]
-
+You can see a live version of the web-based installer for Scale-Out Computing on AWS (SOCA) at link:install.soca.dev[https://install.soca.dev]
 
 
 == Requirements
 
 You will need `python3` (python2 is not supported) as well as `flask`, `ipaddress` and  `boto3`. Run `pip install -r requirements.txt` to install all required dependencies:
 
-You also need `awscli` link:https://aws.amazon.com/cli/[configured] on your machine. My code does not change/create any AWS resources on your behalf. The only required IAM policies are `Describe` and `List`.
+You also need `awscli` link:https://aws.amazon.com/cli/[configured] on your machine if you want to authenticate through AWS profile and not access/secret key. My code does not change/create any AWS resources on your behalf. The only required IAM policies are `Describe` and `List`.
 
 == How it works?
 
 Clone the repo
 ```bash
-git clone https://github.com/mcrozes/soca-web-based-installer.git
+git clone https://github.com/mcrozes/soca-web-based-installer.git .
+```
+
+(optional) Install the dependencies
+```bash
+pip3 install -r requirements.txt
 ```
 
 Execute `python3 main.py`, this will launch a new web portal available at `http://127.0.0.1:5000`. You can change the listener address/port if needed by updating `main.py`
 
 ```python
-python3 soca-web-based-installer/main.py
+python3 main.py
 
 =============================================
 Access the installer using http://127.0.0.1:5000
