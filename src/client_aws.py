@@ -8,7 +8,7 @@ except ImportError:
 
 
 class CheckAWSConfiguration:
-    def __init__(self, session, region=False):
+    def __init__(self, session, region="us-east-1"):
         if "profile" in session.keys():
             self.session = boto3.Session(profile_name=session["profile"],
                                          region_name=region)
@@ -20,9 +20,8 @@ class CheckAWSConfiguration:
 
         else:
             self.session = boto3.Session(aws_access_key_id="INVALID",
-                                         aws_secret_access_key="INVALID")
-
-
+                                         aws_secret_access_key="INVALID",
+                                         region_name=region)
 
     def get_vpcs(self):
         try:
@@ -238,7 +237,7 @@ class CheckAWSConfiguration:
 
     def get_regions(self):
         try:
-            ec2 = boto3.client('ec2')
+            ec2 = self.session.client('ec2')
             regions = []
             for region in ec2.describe_regions()['Regions']:
                 regions.append(region['RegionName'])

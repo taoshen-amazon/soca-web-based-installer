@@ -51,11 +51,13 @@ def index():
     return render_template("index.html",
                            step=0)
 
+
 @app.route("/prerequisites")
 def prerequisites():
     return render_template("prerequisites.html",
                            step=0,
                            get_params=request.args)
+
 
 @app.route("/environment")
 def environment():
