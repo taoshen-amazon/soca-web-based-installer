@@ -17,8 +17,13 @@
               <main role="main">
                   <section class="jumbotron text-center">
                         <div class="container" style="text-align: left">
-                          <p class="lead text-muted">Select your OS and image id (optional)</p>
+                          <p class="lead text-muted">What Linux distribution and Image (optional) are you using? </p>
                             <hr>
+
+                         <div class="alert alert-primary" role="alert">
+                         <a href="https://awslabs.github.io/scale-out-computing-on-aws/#os-agnostic-and-support-for-custom-ami" target="_blank">SOCA is OS agnostic.</a>
+                             You can have 10 jobs running 10 different AMI (centos/ali/rhel) on the same cluster
+                         </div>
 
                             <form action="/stack_name" method="get">
                                 {% for k,v in get_params.items() %}
@@ -27,7 +32,7 @@
 
 
                                 <div class="form-group">
-                                    <h3>Base OS</h3>
+                                    <strong>Base OS</strong>
                                     <select required="true" class="form-control" name="base_os" id="base_os" required="true">
                                         <option selected value="amazonlinux2">Amazon Linux 2</option>
                                         <option value="centos7">Centos 7</option>
@@ -36,7 +41,7 @@
                                      </div>
                                     <div class="form-group">
 
-                                        <h3>(Optional) Custom image</h3>
+                                        <strong>(Optional) Custom image</strong>
                                         <div class="alert alert-primary" role="alert">
                                              Make sure to select the right Base OS distribution if you use a custom image
                                          </div>

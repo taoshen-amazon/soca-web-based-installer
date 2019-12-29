@@ -16,36 +16,27 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
-                            <h4>How it works?</h4>
-                            <ul class="list-group">
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Select whether you want to perform a Standard or Advanced install.
-    <span class="badge badge-primary badge-pill">1</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Follow the instructions using the installation wizard.
-    <span class="badge badge-primary badge-pill">2</span>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-center">
-    Click on the link to open the CloudFormation console with your pre-generated stack parameters.
-    <span class="badge badge-primary badge-pill">3</span>
-  </li>
-</ul>
+                        <div class="container" style="text-align: left">
+                            {% with messages = get_flashed_messages() %}
+                                  {% if messages %}
+                                    <div class="alert alert-warning">
+                                    {% for message in messages %}
+                                      {{ message }}
+                                    {% endfor %}
+                                    </div>
+                                  {% endif %}
+                                {% endwith %}
+
+                            <p class="lead text-muted">This wizard will guide you through the configuration of your Scale-Out Computing on AWS (SOCA) cluster.
+                                This tool does not actually install SOCA but simply generates a CloudFormation URL with all your inputs. You can then import it in your AWS CloudFormation console to proceed to the actual installation of SOCA.</p>
                             <hr>
-
                             <div class="row">
-
-
-
                                 <div class="col-md-6">
                                     <h3>Let SOCA install everything</h3>
                                     <a href="/prerequisites?mode=standard"><button style="text-decoration: none; cursor:pointer;" class="btn-lg btn-success">STANDARD INSTALL</button></a>
                                     <br><br>
                                     <h5>Pre-Requisites</h5>
-
                                     You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket.
-                                    <br>You must have <code>awscli</code> <a href="https://aws.amazon.com/cli/" target="_blank"> installed and configured </a>
 
                                 </div>
 
@@ -58,7 +49,6 @@
                                         <h5>Pre-Requisites</h5>
 
                                         You must <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> have built and uploaded your Scale-Out Computing on AWS </a> cluster on S3 bucket.
-                                        <br>You must have <code>awscli</code> <a href="https://aws.amazon.com/cli/" target="_blank"> installed and configured </a>
                                         <br>You must have a VPC
                                         <br>Your VPC must have 6 subnets (3 private/3 public)
                                         <br>You must have 2 Elastic File Systems
@@ -77,64 +67,8 @@
                                 </div>
                             </div>
 
-                            <hr>
-                            <h4>IAM Permissions</h4>
-                     This tool only perform "ReadOnly" operations. Here is the list of API permissions your IAM user must have in order to be able to use this tool.
-<br><br>
-                            <h5>For Standard Installation</h5>
 
 
-<pre style="text-align: left"><code>
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "WebBasedSOCAPermissions",
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListAllMyBuckets",
-                "s3:ListBucket",
-                "ec2:DescribeKeyPairs",
-                "ec2:DescribeRegions"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
- </code></pre>
-                            <h5>For Advanced Installation</h5>
-<pre style="text-align: left"><code>
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "WebBasedSOCAAdvancedPermissions1",
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListAllMyBuckets",
-                "s3:ListBucket",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeSubnets",
-                "ec2:DescribeKeyPairs",
-                "ec2:DescribeSecurityGroups",
-                "ec2:DescribeRegions",
-                "ec2:DescribeNetworkInterfaceAttribute"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "WebBasedSOCAAdvancedPermissions2",
-            "Effect": "Allow",
-            "Action": [
-                "elasticfilesystem:DescribeMountTargets",
-                "elasticfilesystem:DescribeFileSystems",
-                "elasticfilesystem:DescribeMountTargetSecurityGroups"
-            ],
-            "Resource": "arn:aws:elasticfilesystem:*:*:file-system/*"
-        }
-    ]
-}
-</code></pre>
                         </div>
 
 

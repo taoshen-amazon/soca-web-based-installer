@@ -34,12 +34,13 @@
                           </form>
                           {%  if get_params.mode == "standard" %}
                             <div class="alert alert-warning">
-                            <strong>Why do we need this?</strong><br>
+                             <strong>Why do we need this?</strong><br>
                                 The web based wizard will need to perform ReadOnly API operations to work. We do not create any resources on your behalf and only need a small subset of read-only permissions (listed below).
-                                If you are not comfortable with this option, you can clone the repo and run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a>. <br>
-<br>
+                                <br><br>
+                                 <strong>I'm not comfortable giving my access/secret keys to a random website </strong><br>
+                                 If you are not comfortable with this option, simply clone the repo, run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a>.<br> We do not store any access/secret key and your session is automatically deleted after 60 minutes.<br><br>
                             <strong>IAM Policies for {{ get_params.mode }} installation:</strong>
-                               <br> Create an IAM user and apply the following permissions:
+                                 <br>Create an IAM user and apply the following readonly permissions:
                             {% include "common/permissions_standard.html" %}
                             </div>
 
@@ -48,10 +49,11 @@
                              <div class="alert alert-warning">
                             <strong>Why do we need this?</strong><br>
                                 The web based wizard will need to perform ReadOnly API operations to work. We do not create any resources on your behalf and only need a small subset of read-only permissions (listed below).
-                                 If you are not comfortable with this option, simply clone the repo and run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a> <br>
-<br>
+                                <br><br>
+                                 <strong>I'm not comfortable giving my access/secret keys to a random website </strong><br>
+                                 If you are not comfortable with this option, simply clone the repo, run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a>.<br> We do not store any access/secret key and your session is automatically deleted after 60 minutes.<br><br>
                             <strong>IAM Policies for {{ get_params.mode }} installation:</strong>
-                                 <br>Create an IAM user and apply the following permissions:
+                                 <br>Create an IAM user and apply the following readonly permissions:
                                  {% include "common/permissions_advanced.html" %}
                             </div>
                         {% endif %}

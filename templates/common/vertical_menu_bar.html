@@ -5,6 +5,8 @@
     <div align="center">
             <a href="/"><button style="text-decoration: none;" class="btn btn-sm btn-warning">RESTART CONFIGURATION</button></a>
     <br>
+
+
         {% if step > 1 %}
         <hr>
         <button onclick="history.back(-1)"  style="text-decoration: none;" class="btn btn-sm btn-primary">Go Back</button></a>
@@ -14,6 +16,14 @@
     <br>
     <hr class="sidebar-divider">
 
+    <div class="text-center d-none d-md-inline">
+        {% if step > 0 %}
+            <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> Pre-Requisites</span></strong>
+        {% else %}
+            <span>Pre-Requisites</span>
+        {% endif %}
+
+    </div>
     <div class="text-center d-none d-md-inline">
         {% if step > 1 %}
             <strong><span style="color: #16bf9f;">  <i class="far fa-check-square"></i> AWS Environment</span></strong>

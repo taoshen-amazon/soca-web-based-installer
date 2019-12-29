@@ -1,9 +1,15 @@
-= Web-Based Installer for SOCA
+= Web-Based Installer for Scale-Out Computing on AWS (SOCA)
 :toc:
 
 == What is SOCA?
 
 Refer to link:https://awslabs.github.io/scale-out-computing-on-aws/[https://awslabs.github.io/scale-out-computing-on-aws/] if you are not familiar with SOCA.
+
+== Online Version
+
+You can see a live version of the web-based installer for Scale-Out Computing on AWS (SOCA) at: link:install.soca.dev[https://install.soca.dev]
+
+
 
 == Requirements
 

@@ -2,8 +2,10 @@ import sys
 import requests
 import ipaddress
 import uuid
+from functools import wraps
+from datetime import timedelta
 try:
-    from flask import Flask, render_template, request, redirect, session
+    from flask import Flask, render_template, request, redirect, session, flash, url_for
 except ImportError:
     print("Flask extension is required. Run 'pip install flask' and try again")
     sys.exit(1)
@@ -12,7 +14,19 @@ from src import get_awscli_credentials
 import src.client_aws as client
 app = Flask(__name__)
 app.config["SECRET_KEY"] = str(uuid.uuid4())
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=60)
 
+
+def session_required(f):
+    @wraps(f)
+    def validate_session():
+        if 'access_key' in session.keys() and 'secret_key' in session.keys():
+            return f()
+        elif 'profile' in session.keys():
+            return f()
+        else:
+           return redirect("/?timeout")
+    return validate_session
 
 
 def validate_parameters(request, expected_parameters):
@@ -32,6 +46,8 @@ def validate_parameters(request, expected_parameters):
 @app.route("/")
 def index():
     session.clear()
+    if "timeout" in request.args.keys():
+        flash("For security reasons, we have deleted your session after 60 minutes. Please launch the wizard again")
     return render_template("index.html",
                            step=0)
 
@@ -73,6 +89,7 @@ def auth():
 
 
 @app.route("/region")
+@session_required
 def region():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -86,6 +103,7 @@ def region():
 
 
 @app.route("/vpc")
+@session_required
 def vpc():
     if validate_parameters(request, ["mode", "region"]) is False:
         return redirect("/")
@@ -98,6 +116,7 @@ def vpc():
                            get_params=request.args)
 
 @app.route("/vpc_cidr")
+@session_required
 def vpc_cidr():
     if validate_parameters(request, ["region", "mode"]) is False:
         return redirect("/")
@@ -108,6 +127,7 @@ def vpc_cidr():
 
 
 @app.route("/private_subnets")
+@session_required
 def private_subnets():
     if validate_parameters(request, ["mode", "region", "vpc"]) is False:
         return redirect("/")
@@ -134,6 +154,7 @@ def private_subnets():
 
 
 @app.route("/public_subnets")
+@session_required
 def public_subnets():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3"]) is False:
         return redirect("/")
@@ -170,6 +191,7 @@ def public_subnets():
 
 
 @app.route("/subnet_verif")
+@session_required
 def subnet_verif():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                      "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
@@ -213,10 +235,8 @@ def subnet_verif():
                             get_params=request.args)
 
 
-
-
-
 @app.route("/efs_data")
+@session_required
 def efs_data():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                      "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
@@ -230,6 +250,7 @@ def efs_data():
 
 
 @app.route("/efs_apps")
+@session_required
 def efs_apps():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data"]) is False:
@@ -244,6 +265,7 @@ def efs_apps():
 
 
 @app.route("/ssh")
+@session_required
 def ssh():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -265,6 +287,7 @@ def ssh():
 
 
 @app.route("/s3_bucket")
+@session_required
 def s3_bucket():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -286,6 +309,7 @@ def s3_bucket():
 
 
 @app.route("/s3_folder")
+@session_required
 def s3_folder():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -306,6 +330,7 @@ def s3_folder():
                            get_params=request.args)
 
 @app.route("/client_ip")
+@session_required
 def client_ip():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -334,6 +359,7 @@ def client_ip():
                            get_params=request.args)
 
 @app.route("/security_groups")
+@session_required
 def security_groups():
     if validate_parameters(request, ["region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
@@ -349,6 +375,7 @@ def security_groups():
 
 
 @app.route("/sg_verif")
+@session_required
 def sg_verif():
     if validate_parameters(request, ["region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip", "sg_scheduler", "sg_compute"]) is False:
@@ -440,6 +467,7 @@ def sg_verif():
                                get_params=request.args)
 
 @app.route("/image")
+@session_required
 def image():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -452,10 +480,12 @@ def image():
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip"]) is False:
                 return redirect("/")
 
-    return render_template("images.html",
+    return render_template("image.html",
                            step=13,
                            get_params=request.args)
+
 @app.route("/stack_name")
+@session_required
 def stack_name():
     if validate_parameters(request, ["mode"]) is False:
         return redirect("/")
@@ -477,13 +507,12 @@ def review():
         return redirect("/")
     else:
         if request.args["mode"] == "standard":
-            if validate_parameters(request, ["region", "vpc_cidr", "key","s3_bucket", "s3_folder", "base_os", "instance_ami", "stack_name"]) is False:
+            if validate_parameters(request, ["region", "vpc_cidr", "key", "s3_bucket", "s3_folder", "base_os", "instance_ami", "stack_name"]) is False:
                 return redirect("/")
         else:
             if validate_parameters(request, ["region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                   "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data", "efs_apps", "key", "s3_bucket", "client_ip",  "base_os", "instance_ami", "stack_name"]) is False:
                 return redirect("/")
-
 
     if request.args["mode"] == "advanced":
         cloudformation_url = "https://console.aws.amazon.com/cloudformation/home?" \
