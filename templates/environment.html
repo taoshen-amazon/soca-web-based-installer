@@ -16,22 +16,59 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
-                            <p class="lead text-muted">Select which AWS environment you want to use</p>
-                            <hr>
+                      <div class="container" style="text-align: left">
+                          <p class="lead text-muted">Select which AWS environment you want to use</p>
+                          <hr>
+                          <strong>Option 1: IAM Access/Secret Keys</strong>
+                          <form action="/auth" method="post">
+                              {% for k,v in get_params.items() %}
+                                  <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
+                              {% endfor %}
+                              <div class="form-group">
+                                  <input type="text" name="access_key" class="form-control" id="access_key" placeholder="Your IAM Access Key" required="true">
+                              </div>
+                              <div class="form-group">
+                                  <input type="text" name="secret_key" class="form-control" id="secret_key" placeholder="Your IAM Secret Key" required="true">
+                              </div>
+                              <button type="submit" class="btn btn-success mb-2">Continue</button>
+                          </form>
+                          {%  if get_params.mode == "standard" %}
+                            <div class="alert alert-warning">
+                            <strong>Why do we need this?</strong><br>
+                                The web based wizard will need to perform ReadOnly API operations to work. We do not create any resources on your behalf and only need a small subset of read-only permissions (listed below).
+                                If you are not comfortable with this option, you can clone the repo and run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a>. <br>
+<br>
+                            <strong>IAM Policies for {{ get_params.mode }} installation:</strong>
+                               <br> Create an IAM user and apply the following permissions:
+                            {% include "common/permissions_standard.html" %}
+                            </div>
 
+
+                        {% else %}
+                             <div class="alert alert-warning">
+                            <strong>Why do we need this?</strong><br>
+                                The web based wizard will need to perform ReadOnly API operations to work. We do not create any resources on your behalf and only need a small subset of read-only permissions (listed below).
+                                 If you are not comfortable with this option, simply clone the repo and run a local version of <a href="https://github.com/mcrozes/soca-web-based-installer" target="_blank">https://github.com/mcrozes/soca-web-based-installer</a> <br>
+<br>
+                            <strong>IAM Policies for {{ get_params.mode }} installation:</strong>
+                                 <br>Create an IAM user and apply the following permissions:
+                                 {% include "common/permissions_advanced.html" %}
+                            </div>
+                        {% endif %}
+
+                            <strong>Option 2: Use local <code>awscli</code> environment (local deployment only)</strong>
                             {% if envs|length == 0 %}
                             <div class="alert alert-danger" role="alert">
                                 No environment found. Install <code>awscli</code> first and run <code>aws configure</code>
                             </div>
                             {% else %}
-                            <form action="/region" method="get">
+                            <form action="/auth" method="post">
                                 {% for k,v in get_params.items() %}
                                 <input type="hidden" name="{{k}}" id="{{k}}" value="{{v}}">
                                 {% endfor %}
 
                                  <div class="form-group">
-                                    <select required="true" class="form-control" name="env" id="env">
+                                    <select required="true" class="form-control" name="profile" id="profile">
                                         {% for env in envs %}
                                         <option value="{{env}}">{{env}}</option>
                                         {% endfor %}

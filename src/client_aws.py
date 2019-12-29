@@ -1,4 +1,5 @@
 import sys
+
 try:
     import boto3
 except ImportError:
@@ -7,11 +8,21 @@ except ImportError:
 
 
 class CheckAWSConfiguration:
-    def __init__(self, profile, region):
-        self.profile = profile
-        self.region = region
-        self.session = boto3.Session(profile_name=self.profile,
-                                     region_name=self.region)
+    def __init__(self, session, region=False):
+        if "profile" in session.keys():
+            self.session = boto3.Session(profile_name=session["profile"],
+                                         region_name=region)
+
+        elif "access_key" in session.keys() and "secret_key" in session.keys():
+            self.session = boto3.Session(aws_access_key_id=session["access_key"],
+                                         aws_secret_access_key=session["secret_key"],
+                                         region_name=region)
+
+        else:
+            self.session = boto3.Session(aws_access_key_id="INVALID",
+                                         aws_secret_access_key="INVALID")
+
+
 
     def get_vpcs(self):
         try:
@@ -224,4 +235,16 @@ class CheckAWSConfiguration:
         except Exception as err:
             return {'success': False,
                 'message': str(err)}
+
+    def get_regions(self):
+        try:
+            ec2 = boto3.client('ec2')
+            regions = []
+            for region in ec2.describe_regions()['Regions']:
+                regions.append(region['RegionName'])
+            return {'success': True,
+                    'message': sorted(regions)}
+        except Exception as err:
+            return {'success': False,
+                    'message': str(err)}
 

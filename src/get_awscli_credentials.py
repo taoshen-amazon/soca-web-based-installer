@@ -8,19 +8,6 @@ except ImportError:
     sys.exit(1)
 
 
-def get_regions():
-    try:
-        ec2 = boto3.client('ec2')
-        regions = []
-        for region in ec2.describe_regions()['Regions']:
-            regions.append(region['RegionName'])
-        return {'success': True,
-                'message': sorted(regions)}
-    except Exception as err:
-        return {'success': False,
-                'message': str(err)}
-
-
 def get_config_file():
     config = ConfigParser(allow_no_value=True)
     unix_user_home = str(Path.home())

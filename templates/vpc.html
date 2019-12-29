@@ -16,20 +16,12 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
+                        <div class="container" style="text-align: left">
                           <p class="lead text-muted">Select the VPC where you want to deploy SOCA</p>
                             <hr>
 
                             {% if success == False %}
-                             <div class="alert alert-danger" role="alert">
-                                The following error occurred while querying AWS APIs: {{message}}
-                                 <hr>
-                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow:
-                                 <li>ec2:Describe*</li>
-                                 <li>elasticfilesystem:Describe*</li>
-                                 <li>s3:Describe*</li>
-                                 <li>s3:List*</li>
-                             </div>
+                                {%  include "common/error.html" %}
                             {% else %}
 
                             {% if message|length == 0 %}

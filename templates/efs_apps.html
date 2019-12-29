@@ -16,16 +16,11 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
+                        <div class="container" style="text-align: left">
                           <p class="lead text-muted">What EFS do you want to use as /apps?</p>
                             <hr>
                             {% if success == False %}
-                             <div class="alert alert-danger" role="alert">
-                                The following error occurred while querying AWS APIs: {{message}}
-                                 <hr>
-                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
-                             </div>
-
+                             {%  include "common/error.html" %}
                             {% else %}
 
                             {% if message|length < 2 %}

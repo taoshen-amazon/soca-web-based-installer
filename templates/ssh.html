@@ -16,18 +16,19 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
+                        <div class="container" style="text-align: left">
                             <p class="lead text-muted">Choose the SSH key that will be used by to access your scheduler host</p>
                             <hr>
 
                             {% if success == False %}
-                             <div class="alert alert-danger" role="alert">
-                                The following error occurred while querying AWS APIs: {{message}}
-                                 <hr>
-                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
-                             </div>
-
+                                {%  include "common/error.html" %}
                             {% else %}
+
+                                {% if message|length < 1 %}
+                                <div class="alert alert-danger" role="alert">
+                                    No SSH keys detected on this region.
+                                </div>
+                                {% else %}
 
                             <form action="/s3_bucket" method="get">
                                 {% for k,v in get_params.items() %}
@@ -45,6 +46,7 @@
                             </form>
 
                             {%endif %}
+                        {%endif %}
                 </section>
               </main>
           </div>

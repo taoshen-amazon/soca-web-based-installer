@@ -1,0 +1,10 @@
+<div class="alert alert-danger" role="alert">
+    The following error occurred while querying AWS APIs: {{message}}
+    <hr>
+    <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and make sure you have specified the correct policies.
+    {% if get_params.mode == "standard" %}
+        {% include "common/permissions_standard.html" %}
+    {% else %}
+        {% include "common/permissions_advanced.html" %}
+    {% endif %}
+</div>

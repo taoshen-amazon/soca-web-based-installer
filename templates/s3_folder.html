@@ -16,7 +16,7 @@
               {% include 'common/horizontal_menu_bar.html' %}
               <main role="main">
                   <section class="jumbotron text-center">
-                        <div class="container">
+                        <div class="container" style="text-align: left">
                           <p class="lead text-muted">Top level folder containing SOCA install</p>
                             <div class="alert alert-primary" role="alert">
                                 Click <a href="https://awslabs.github.io/scale-out-computing-on-aws/install-soca-cluster/" target="_blank"> this link</a> to learn how to build and upload SOCA on your S3
@@ -24,12 +24,7 @@
                             <hr>
 
                             {% if success == False %}
-                             <div class="alert alert-danger" role="alert">
-                                The following error occurred while querying AWS APIs: {{message}}
-                                 <hr>
-                                 <strong>Possible Resolution:</strong> Make sure your IAM credentials are valid and allow ec2:Describe*, elasticfilesystem:Describe*, s3:List*, s3:Describe*
-                             </div>
-
+                            {%  include "common/error.html" %}
                             {% else %}
                              {% if message|length < 1 %}
                                 <div class="alert alert-danger" role="alert">

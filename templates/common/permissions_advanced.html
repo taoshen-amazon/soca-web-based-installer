@@ -1,0 +1,32 @@
+<pre style="text-align: left"><code>
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "WebBasedSOCAAdvancedPermissions1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAllMyBuckets",
+                "s3:ListBucket",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeRegions",
+                "ec2:DescribeNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "WebBasedSOCAAdvancedPermissions2",
+            "Effect": "Allow",
+            "Action": [
+                "elasticfilesystem:DescribeMountTargets",
+                "elasticfilesystem:DescribeFileSystems",
+                "elasticfilesystem:DescribeMountTargetSecurityGroups"
+            ],
+            "Resource": "arn:aws:elasticfilesystem:*:*:file-system/*"
+        }
+    ]
+}
+</code></pre>
