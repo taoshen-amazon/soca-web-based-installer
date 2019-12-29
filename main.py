@@ -50,7 +50,8 @@ def region():
     regions = get_awscli_credentials.get_regions()
     return render_template("region.html",
                            step=2,
-                           message=regions,
+                           message=regions["message"],
+                           success=regions["success"],
                            get_params=request.args)
 
 

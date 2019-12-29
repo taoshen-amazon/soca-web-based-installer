@@ -9,11 +9,16 @@ except ImportError:
 
 
 def get_regions():
-    ec2 = boto3.client('ec2')
-    regions = []
-    for region in ec2.describe_regions()['Regions']:
-        regions.append(region['RegionName'])
-    return sorted(regions)
+    try:
+        ec2 = boto3.client('ec2')
+        regions = []
+        for region in ec2.describe_regions()['Regions']:
+            regions.append(region['RegionName'])
+        return {'success': True,
+                'message': sorted(regions)}
+    except Exception as err:
+        return {'success': False,
+                'message': str(err)}
 
 
 def get_config_file():
