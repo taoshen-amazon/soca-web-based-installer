@@ -243,7 +243,7 @@ def efs_data():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                                      "public_subnet_1", "public_subnet_2", "public_subnet_3"]) is False:
         return redirect("/")
-    filesystems = client.CheckAWSConfiguration(session, request.args["region"]).get_efs()
+    filesystems = client.CheckAWSConfiguration(session, request.args["region"]).get_efs(request.args["region"])
     return render_template("efs_data.html",
                            step=6,
                            message=filesystems["message"],
@@ -257,7 +257,7 @@ def efs_apps():
     if validate_parameters(request, ["mode", "region", "vpc", "private_subnet_1", "private_subnet_2", "private_subnet_3",
                           "public_subnet_1", "public_subnet_2", "public_subnet_3", "efs_data"]) is False:
         return redirect("/")
-    filesystems = client.CheckAWSConfiguration(session, request.args["region"]).get_efs()
+    filesystems = client.CheckAWSConfiguration(session, request.args["region"]).get_efs(request.args["region"])
     filesystems["message"].pop(validate_parameters(request, ["efs_data"])["efs_data"])
     return render_template("efs_apps.html",
                            step=7,

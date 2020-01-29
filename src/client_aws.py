@@ -167,12 +167,12 @@ class CheckAWSConfiguration:
             return {'success': False,
                     'message': str(err)}
 
-    def get_efs(self):
+    def get_efs(self, region):
         try:
             efs = self.session.client("efs")
             filesystems = {}
             for filesystem in efs.describe_file_systems()['FileSystems']:
-                filesystems[filesystem['FileSystemId'] + ".efs." + self.region + ".amazonaws.com" ] = filesystem['Name']
+                filesystems[filesystem['FileSystemId'] + ".efs." + region + ".amazonaws.com" ] = filesystem['Name']
             return {"success": True,
                     "message": filesystems}
 
